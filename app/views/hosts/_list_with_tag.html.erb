@@ -1,0 +1,64 @@
+<%= javascript "jquery.cookie", "host_checkbox" %>
+<% title header ||= "" %>
+<table class="table table-fixed table-bordered table-striped table-two-pane table-condensed" >
+  <thead>
+  <tr>
+    <th class="ca" width="40px"><%= check_box_tag "check_all", "", false, { :onclick => "toggleCheck()", :'check-title' => _("Select all items in this page"), :'uncheck-title'=> _("items selected. Uncheck to Clear") } %></th>
+    <th width="25%"><%= sort :name, :as => _('Name') %></th>
+    <th class="hidden-xs" width="10%"><%= sort :os, :as => _("Operating system") %></th>
+    <th class="hidden-xs" width="9%"><%= sort :environment, :as => _('Environment') %></th>
+    <th class="hidden-tablet " width="9%"><%= sort :model, :as => _('Model') %></th>
+    <th class="hidden-tablet " width="16%"><%= sort :hostgroup, :as => _("Host group") %></th>
+    <th class="hidden-tablet " width="9%"><%= sort :last_report, :as => _('Last report'), :default => 'DESC' %></th>
+    <th class="hidden-tablet " width="9%"><%= sort :last_report, :as => _('tag') %></th>
+    <th></th>
+  </tr>
+  </thead>
+  <tbody>
+  <% hosts.each do |host| %>
+    <tr>
+      <td class="ca">
+        <%= check_box_tag "host_ids[]", nil, false, :id => "host_ids_#{host.id}", :disabled => !authorized?, :class => 'host_select_boxes', :onclick => 'hostChecked(this)' %>
+      </td>
+      <td class="ellipsis"><%= name_column(host) %>
+      </td>
+      <td class="hidden-xs ellipsis"><%= (icon(host.operatingsystem, :size => "18x18") + " #{host.operatingsystem.to_label}").html_safe if host.operatingsystem %></td>
+      <td class="hidden-xs ellipsis"><%= host.environment %></td>
+      <td class="hidden-tablet  ellipsis"><%= model_name host %></td>
+      <td class="hidden-tablet "><%= label_with_link host.hostgroup, 26, @hostgroup_authorizer %></td>
+      <td class="hidden-tablet  ellipsis"><%= last_report_column(host) %></td>
+      <td class="hidden-tablet ellipsis"><%=  host.type_list.empty? ? "<span  class=\"display-two-pane\"> #{link_to(icon_text('plus-sign', _('Add Tag'), :class => 'icon-black'), :action => "tag", :id => host.id)} </span>".html_safe  :
+                                                "<span class=\"tag\" data-toggle=\"tooltip\" data-html=\"true\" data-placement=\"top\" title=\"#{tag_tool_tip(host)}\"> #{link_to(icon_text('minus-sign'), :action => "remove_tag", :id => host.id) + host.type_list[0]} </span>".html_safe %></td>
+      <td>
+        <%= action_buttons(
+                display_link_if_authorized(_("Edit"), hash_for_edit_host_path(:id => host).merge(:auth_object => host, :authorizer => authorizer)),
+                display_link_if_authorized(_("Clone"), hash_for_clone_host_path(:id => host)),
+                display_delete_if_authorized(hash_for_host_path(:id => host).merge(:auth_object => host, :authorizer => authorizer), :data => { :confirm => delete_host_dialog(host) }, :action => :destroy))
+        %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+<div id="confirmation-modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><%= _('Please Confirm') %></h4>
+      </div>
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><%= _('Cancel') %></button>
+        <button type="button" class="btn btn-primary" onclick="submit_modal_form()"><%= _('Submit') %></button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<%= will_paginate_with_info hosts, :more => " - "+_("<b class='select_count'>0</b> selected") %>
+
+<script type="text/javascript" charset="utf-8">
+
+</script>
+

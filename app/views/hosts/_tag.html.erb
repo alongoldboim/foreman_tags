@@ -1,0 +1,17 @@
+<%= form_for @host, url: {action: "add_tag"} do |f| %>
+  <div class="tab-content">
+    <div class="tab-pane active" id="primary">
+      <div>
+        <%= label_tag :tag_type %>:
+        <%= text_field_tag 'tag_status' %><br/>
+        <%= label_tag :tag_reason %>:
+        <%= text_field_tag 'tag_reason' %><br/>
+        <%= label_tag :added_by_user %>:
+        <%= text_field_tag 'user', User.current, :disabled => true %><br/>
+        <%= label_tag :at %>:
+        <%= text_field_tag 'at', Time.now.to_formatted_s(:short), :disabled => true %><br/>
+      </div>
+      <%= submit_or_cancel f, false %>
+    </div>
+  </div>
+<% end %>
